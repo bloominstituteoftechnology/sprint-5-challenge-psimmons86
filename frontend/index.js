@@ -1,6 +1,4 @@
-async function sprintChallenge5() { // Note the async keyword, in case you wish to use `await` inside sprintChallenge5
-  // 👇 WORK WORK BELOW THIS LINE 👇
-
+document.addEventListener('DOMContentLoaded', async function sprintChallenge5() {
   const footer = document.querySelector('footer');
   const currentYear = new Date().getFullYear();
   footer.textContent = `© BLOOM INSTITUTE OF TECHNOLOGY ${currentYear}`;
@@ -23,12 +21,12 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     console.log('Mentors Data:', mentorsData);
 
     // Combine the data into a single data structure
-    const combinedData = learnersData.map(learner => {
+    const combinedData = (learnersData || []).map(learner => {
       return {
         id: learner.id,
         email: learner.email,
         fullName: learner.fullName,
-        mentors: learner.mentorIds.map(id => {
+        mentors: (learner.mentorIds || []).map(id => {
           const mentor = mentorsData.find(mentor => mentor.id === id);
           return mentor ? mentor.fullName : null;
         }).filter(name => name)
@@ -38,38 +36,15 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     // Log the combined data for debugging
     console.log('Combined Data:', combinedData);
 
-    // Create a function to generate a learner card
-    function createLearnerCard(learner) {
-      const card = document.createElement('div');
-      card.className = 'learner-card';
-
-      const name = document.createElement('h3');
-      name.textContent = learner.fullName;
-      card.appendChild(name);
-
-      const email = document.createElement('p');
-      email.textContent = `Email: ${learner.email}`;
-      card.appendChild(email);
-
-      const mentorList = document.createElement('ul');
-      mentorList.className = 'mentor-list hidden';
-      learner.mentors.forEach(mentor => {
-        const mentorItem = document.createElement('li');
-        mentorItem.textContent = mentor;
-        mentorList.appendChild(mentorItem);
-      });
-      card.appendChild(mentorList);
-
-      card.addEventListener('click', () => {
-        card.classList.toggle('highlighted');
-        mentorList.classList.toggle('hidden');
-      });
-
-      return card;
-    }
-
     // Render the learner cards to the DOM
     const container = document.getElementById('learners-container');
+
+    if (!container) {
+      throw new Error('Container element not found');
+    }
+
+    container.innerHTML = ''; // Clear existing content if any
+
     combinedData.forEach(learner => {
       const card = createLearnerCard(learner);
       container.appendChild(card);
@@ -78,10 +53,37 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
   } catch (error) {
     console.error('Error fetching and processing data:', error);
   }
-  
-  // 👆 WORK WORK ABOVE THIS LINE 👆
+});
+
+function createLearnerCard(learner) {
+  const card = document.createElement('div');
+  card.className = 'learner-card';
+
+  const name = document.createElement('h3');
+  name.textContent = learner.fullName;
+  card.appendChild(name);
+
+  const email = document.createElement('p');
+  email.textContent = `Email: ${learner.email}`;
+  card.appendChild(email);
+
+  const mentorList = document.createElement('ul');
+  mentorList.className = 'mentor-list hidden';
+  (learner.mentors || []).forEach(mentor => {
+    const mentorItem = document.createElement('li');
+    mentorItem.textContent = mentor;
+    mentorList.appendChild(mentorItem);
+  });
+  card.appendChild(mentorList);
+
+  card.addEventListener('click', () => {
+    card.classList.toggle('highlighted');
+    mentorList.classList.toggle('hidden');
+  });
+
+  return card;
 }
 
-// ❗ DO NOT CHANGE THE CODE  BELOW
+// ❗ DO NOT CHANGE THE CODE BELOW
 if (typeof module !== 'undefined' && module.exports) module.exports = { sprintChallenge5 }
 else sprintChallenge5()
